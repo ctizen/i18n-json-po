@@ -1,5 +1,4 @@
 import {
-  I18NEntry,
   SingleI18NEntry,
   PluralI18NEntry,
   TranslationJson,
@@ -7,9 +6,9 @@ import {
 } from 'i18n-proto';
 
 export type InitialMeta = {
-  copyrightSubject?: string,
-  bugsEmail?: string,
-  year?: number
+  copyrightSubject?: string;
+  bugsEmail?: string;
+  year?: number;
 };
 
 export function getTzOffset(date: Date) {
@@ -34,10 +33,10 @@ export function makeDate(date: Date) {
 }
 
 export function makePoHeader({ meta, initialMeta, genDate, hasPluralForms }: {
-  meta?: TranslationMeta,
-  initialMeta: InitialMeta,
-  genDate: string,
-  hasPluralForms: boolean
+  meta?: TranslationMeta;
+  initialMeta: InitialMeta;
+  genDate: string;
+  hasPluralForms: boolean;
 }): string {
   if (!meta) {
     // make POT, use initial meta
@@ -63,31 +62,32 @@ msgstr ""
 `;
   } else {
     // have meta - make po!
-    let headers = {
-      projectIdVersion: (v) => `Project-Id-Version: ${v}\n`,
-      reportMsgidBugsTo: (v) => `Report-Msgid-Bugs-To: ${v}\n`,
-      potCreationDate: (v) => `POT-Creation-Date: ${v}\n`,
-      poRevisionDate: (v) => `PO-Revision-Date: ${v}\n`,
-      lastTranslator: (v) => `Last-Translator: ${v.name} <${v.email}>\n`,
-      languageTeam: (v) => `Language-Team: ${v}\n`,
-      mimeVersion: (v) => `MIME-Version: ${v}\n`,
-      contentType: (v) => `Content-Type: ${v}\n`,
-      contentTransferEncoding: (v) => `Content-Transfer-Encoding: ${v}\n`,
-      generatedBy: (v) => `Generated-By: ${v}\n`,
-      language: (v) => `Language: ${v}\n`,
-      pluralForms: (v) => `Plural-Forms: ${v}\n`,
+    const headers = {
+      projectIdVersion: (v: string) => `Project-Id-Version: ${v}\n`,
+      reportMsgidBugsTo: (v: string) => `Report-Msgid-Bugs-To: ${v}\n`,
+      potCreationDate: (v: string) => `POT-Creation-Date: ${v}\n`,
+      poRevisionDate: (v: string) => `PO-Revision-Date: ${v}\n`,
+      lastTranslator: (v: { name: string; email: string }) => `Last-Translator: ${v.name} <${v.email}>\n`,
+      languageTeam: (v: string) => `Language-Team: ${v}\n`,
+      mimeVersion: (v: string) => `MIME-Version: ${v}\n`,
+      contentType: (v: string) => `Content-Type: ${v}\n`,
+      contentTransferEncoding: (v: string) => `Content-Transfer-Encoding: ${v}\n`,
+      generatedBy: (v: string) => `Generated-By: ${v}\n`,
+      language: (v: string) => `Language: ${v}\n`,
+      pluralForms: (v: string) => `Plural-Forms: ${v}\n`,
     };
-    let items = [
+    const items = [
       'msgid ""',
       'msgstr ""',
     ];
     let pluralFormsHeaderFound = false;
-    for (let name in meta) {
-      if (name === 'pluralForms') {
+    Object.keys(meta).forEach((key: keyof typeof meta) => {
+      if (key === 'pluralForms') {
         pluralFormsHeaderFound = true;
       }
-      items.push(JSON.stringify(headers[name](meta[name])));
-    }
+      // @ts-expect-error
+      items.push(JSON.stringify(headers[key](meta[key])));
+    })
 
     if (hasPluralForms && !pluralFormsHeaderFound) {
       throw new Error('Translation has some plural forms, but Plural-Forms header was not found');
@@ -99,11 +99,11 @@ msgstr ""
 
 export function convert(json: string, initialMeta: InitialMeta | undefined, printOccurences: boolean): string {
   const document: TranslationJson = JSON.parse(json);
-  let poEntries: PotEntry[] = [];
+  const poEntries: PotEntry[] = [];
   let hasPluralForms = false;
 
-  for (let item of document.items) {
-    let potEntry = new PotEntry();
+  for (const item of document.items) {
+    const potEntry = new PotEntry();
     if (item.type === 'single') {
       potEntry.parseSingleEntry(item, printOccurences, !!document.meta);
     }
@@ -116,7 +116,7 @@ export function convert(json: string, initialMeta: InitialMeta | undefined, prin
 
   return makePoHeader({
     meta: document.meta,
-    initialMeta,
+    initialMeta: initialMeta ?? {},
     genDate: makeDate(new Date()),
     hasPluralForms
   }) + poEntries.map((entry) => entry.asString()).join("\n\n");
@@ -130,7 +130,7 @@ export class PotEntry {
   protected addContext = (context: string) => this.items.push('msgctxt ' + JSON.stringify(context));
   protected addMsgid = (id: string) => this.items.push('msgid ' + JSON.stringify(id));
   protected addMsgidPlural = (id: string) => this.items.push('msgid_plural ' + JSON.stringify(id));
-  protected addMsgstr = (translation: string = '') => this.items.push('msgstr ' + JSON.stringify(translation));
+  protected addMsgstr = (translation = '') => this.items.push('msgstr ' + JSON.stringify(translation));
   protected addMsgstrPlural = (translations: string[]) => {
     if (!translations.length) { // 2 empty translations by default
       this.items.push('msgstr[0] ""');
@@ -143,7 +143,7 @@ export class PotEntry {
   public asString = () => this.items.join("\n");
 
   public parseSingleEntry(
-    { entry, comments, occurences, context, type, translation }: SingleI18NEntry,
+    { entry, comments, occurences, context, translation }: SingleI18NEntry,
     printOccurences: boolean,
     includeTranslations: boolean
   ): PotEntry {
@@ -167,7 +167,7 @@ export class PotEntry {
   }
 
   public parsePluralEntry(
-    { entry, comments, occurences, context, type, translations }: PluralI18NEntry,
+    { entry, comments, occurences, context, translations }: PluralI18NEntry,
     printOccurences: boolean,
     includeTranslations: boolean
   ): PotEntry {
