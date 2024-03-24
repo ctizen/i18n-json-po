@@ -1,6 +1,9 @@
-export function getTzOffset(date) {
-    const timezoneShift = date.getTimezoneOffset() / -60;
-    let tz = 'Z';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PotEntry = exports.convert = exports.makePoHeader = exports.makeDate = exports.getTzOffset = void 0;
+function getTzOffset(date) {
+    var timezoneShift = date.getTimezoneOffset() / -60;
+    var tz = 'Z';
     if (timezoneShift !== 0) {
         tz = (timezoneShift > 0 ? '+' : '-') +
             (timezoneShift > 9 ? '' : '0')
@@ -8,7 +11,8 @@ export function getTzOffset(date) {
     }
     return tz;
 }
-export function makeDate(date) {
+exports.getTzOffset = getTzOffset;
+function makeDate(date) {
     return date.getFullYear() + '-' +
         ((date.getMonth() + 1) > 9 ? '' : '0') + (date.getMonth() + 1) + '-' +
         (date.getDate() > 9 ? '' : '0') + date.getDate() + ' ' +
@@ -16,70 +20,55 @@ export function makeDate(date) {
         (date.getMinutes() > 9 ? '' : '0') + date.getMinutes() +
         getTzOffset(date);
 }
-export function makePoHeader({ meta, initialMeta, genDate, hasPluralForms }) {
+exports.makeDate = makeDate;
+function makePoHeader(_a) {
+    var meta = _a.meta, initialMeta = _a.initialMeta, genDate = _a.genDate, hasPluralForms = _a.hasPluralForms;
     if (!meta) {
         // make POT, use initial meta
-        return `# Translations template for PROJECT.
-# Copyright (C) ${initialMeta.year} ${initialMeta.copyrightSubject}
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, ${initialMeta.year}.
-# 
-#, fuzzy
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\\n"
-"Report-Msgid-Bugs-To: ${initialMeta.bugsEmail}\\n"
-"POT-Creation-Date: ${genDate}\\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
-"Language-Team: LANGUAGE <LL@li.org>\\n"
-"MIME-Version: 1.0\\n"
-"Content-Type: text/plain; charset=utf-8\\n"
-"Content-Transfer-Encoding: 8bit\\n"
-"Generated-By: i18n-json2po\\n"
-
-`;
+        return "# Translations template for PROJECT.\n# Copyright (C) ".concat(initialMeta.year, " ").concat(initialMeta.copyrightSubject, "\n# This file is distributed under the same license as the PROJECT project.\n# FIRST AUTHOR <EMAIL@ADDRESS>, ").concat(initialMeta.year, ".\n# \n#, fuzzy\nmsgid \"\"\nmsgstr \"\"\n\"Project-Id-Version: PROJECT VERSION\\n\"\n\"Report-Msgid-Bugs-To: ").concat(initialMeta.bugsEmail, "\\n\"\n\"POT-Creation-Date: ").concat(genDate, "\\n\"\n\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n\"\n\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n\"\n\"Language-Team: LANGUAGE <LL@li.org>\\n\"\n\"MIME-Version: 1.0\\n\"\n\"Content-Type: text/plain; charset=utf-8\\n\"\n\"Content-Transfer-Encoding: 8bit\\n\"\n\"Generated-By: i18n-json2po\\n\"\n\n");
     }
     else {
         // have meta - make po!
-        const headers = {
-            projectIdVersion: (v) => `Project-Id-Version: ${v}\n`,
-            reportMsgidBugsTo: (v) => `Report-Msgid-Bugs-To: ${v}\n`,
-            potCreationDate: (v) => `POT-Creation-Date: ${v}\n`,
-            poRevisionDate: (v) => `PO-Revision-Date: ${v}\n`,
-            lastTranslator: (v) => `Last-Translator: ${v.name} <${v.email}>\n`,
-            languageTeam: (v) => `Language-Team: ${v}\n`,
-            mimeVersion: (v) => `MIME-Version: ${v}\n`,
-            contentType: (v) => `Content-Type: ${v}\n`,
-            contentTransferEncoding: (v) => `Content-Transfer-Encoding: ${v}\n`,
-            generatedBy: (v) => `Generated-By: ${v}\n`,
-            language: (v) => `Language: ${v}\n`,
-            pluralForms: (v) => `Plural-Forms: ${v}\n`,
+        var headers_1 = {
+            projectIdVersion: function (v) { return "Project-Id-Version: ".concat(v, "\n"); },
+            reportMsgidBugsTo: function (v) { return "Report-Msgid-Bugs-To: ".concat(v, "\n"); },
+            potCreationDate: function (v) { return "POT-Creation-Date: ".concat(v, "\n"); },
+            poRevisionDate: function (v) { return "PO-Revision-Date: ".concat(v, "\n"); },
+            lastTranslator: function (v) { return "Last-Translator: ".concat(v.name, " <").concat(v.email, ">\n"); },
+            languageTeam: function (v) { return "Language-Team: ".concat(v, "\n"); },
+            mimeVersion: function (v) { return "MIME-Version: ".concat(v, "\n"); },
+            contentType: function (v) { return "Content-Type: ".concat(v, "\n"); },
+            contentTransferEncoding: function (v) { return "Content-Transfer-Encoding: ".concat(v, "\n"); },
+            generatedBy: function (v) { return "Generated-By: ".concat(v, "\n"); },
+            language: function (v) { return "Language: ".concat(v, "\n"); },
+            pluralForms: function (v) { return "Plural-Forms: ".concat(v, "\n"); },
         };
-        const items = [
+        var items_1 = [
             'msgid ""',
             'msgstr ""',
         ];
-        let pluralFormsHeaderFound = false;
-        Object.keys(meta).forEach((key) => {
+        var pluralFormsHeaderFound_1 = false;
+        Object.keys(meta).forEach(function (key) {
             if (key === 'pluralForms') {
-                pluralFormsHeaderFound = true;
+                pluralFormsHeaderFound_1 = true;
             }
             // @ts-expect-error
-            items.push(JSON.stringify(headers[key](meta[key])));
+            items_1.push(JSON.stringify(headers_1[key](meta[key])));
         });
-        if (hasPluralForms && !pluralFormsHeaderFound) {
+        if (hasPluralForms && !pluralFormsHeaderFound_1) {
             throw new Error('Translation has some plural forms, but Plural-Forms header was not found');
         }
-        return items.join("\n") + "\n\n"; // additional CRLFs to separated header
+        return items_1.join("\n") + "\n\n"; // additional CRLFs to separated header
     }
 }
-export function convert(json, initialMeta, printOccurences) {
-    const document = JSON.parse(json);
-    const poEntries = [];
-    let hasPluralForms = false;
-    for (const item of document.items) {
-        const potEntry = new PotEntry();
+exports.makePoHeader = makePoHeader;
+function convert(json, initialMeta, printOccurences) {
+    var document = JSON.parse(json);
+    var poEntries = [];
+    var hasPluralForms = false;
+    for (var _i = 0, _a = document.items; _i < _a.length; _i++) {
+        var item = _a[_i];
+        var potEntry = new PotEntry();
         if (item.type === 'single') {
             potEntry.parseSingleEntry(item, printOccurences, !!document.meta);
         }
@@ -91,31 +80,37 @@ export function convert(json, initialMeta, printOccurences) {
     }
     return makePoHeader({
         meta: document.meta,
-        initialMeta: initialMeta ?? {},
+        initialMeta: initialMeta !== null && initialMeta !== void 0 ? initialMeta : {},
         genDate: makeDate(new Date()),
-        hasPluralForms
-    }) + poEntries.map((entry) => entry.asString()).join("\n\n");
+        hasPluralForms: hasPluralForms
+    }) + poEntries.map(function (entry) { return entry.asString(); }).join("\n\n");
 }
-export class PotEntry {
-    constructor() {
-        this.addComment = (comment) => this.items.push('#. ' + comment);
-        this.addOccurence = (occ) => this.items.push('#: ' + occ);
-        this.addContext = (context) => this.items.push('msgctxt ' + JSON.stringify(context));
-        this.addMsgid = (id) => this.items.push('msgid ' + JSON.stringify(id));
-        this.addMsgidPlural = (id) => this.items.push('msgid_plural ' + JSON.stringify(id));
-        this.addMsgstr = (translation = '') => this.items.push('msgstr ' + JSON.stringify(translation));
-        this.addMsgstrPlural = (translations) => {
+exports.convert = convert;
+var PotEntry = /** @class */ (function () {
+    function PotEntry() {
+        var _this = this;
+        this.addComment = function (comment) { return _this.items.push('#. ' + comment); };
+        this.addOccurence = function (occ) { return _this.items.push('#: ' + occ); };
+        this.addContext = function (context) { return _this.items.push('msgctxt ' + JSON.stringify(context)); };
+        this.addMsgid = function (id) { return _this.items.push('msgid ' + JSON.stringify(id)); };
+        this.addMsgidPlural = function (id) { return _this.items.push('msgid_plural ' + JSON.stringify(id)); };
+        this.addMsgstr = function (translation) {
+            if (translation === void 0) { translation = ''; }
+            return _this.items.push('msgstr ' + JSON.stringify(translation));
+        };
+        this.addMsgstrPlural = function (translations) {
             if (!translations.length) { // 2 empty translations by default
-                this.items.push('msgstr[0] ""');
-                this.items.push('msgstr[1] ""');
+                _this.items.push('msgstr[0] ""');
+                _this.items.push('msgstr[1] ""');
             }
             else {
-                translations.forEach((val, index) => this.items.push('msgstr[' + index + '] ' + JSON.stringify(val)));
+                translations.forEach(function (val, index) { return _this.items.push('msgstr[' + index + '] ' + JSON.stringify(val)); });
             }
         };
-        this.asString = () => this.items.join("\n");
+        this.asString = function () { return _this.items.join("\n"); };
     }
-    parseSingleEntry({ entry, comments, occurences, context, translation }, printOccurences, includeTranslations) {
+    PotEntry.prototype.parseSingleEntry = function (_a, printOccurences, includeTranslations) {
+        var entry = _a.entry, comments = _a.comments, occurences = _a.occurences, context = _a.context, translation = _a.translation;
         this.items = [];
         if (comments) {
             comments.forEach(this.addComment);
@@ -129,8 +124,9 @@ export class PotEntry {
         this.addMsgid(entry);
         this.addMsgstr(includeTranslations ? translation : '');
         return this;
-    }
-    parsePluralEntry({ entry, comments, occurences, context, translations }, printOccurences, includeTranslations) {
+    };
+    PotEntry.prototype.parsePluralEntry = function (_a, printOccurences, includeTranslations) {
+        var entry = _a.entry, comments = _a.comments, occurences = _a.occurences, context = _a.context, translations = _a.translations;
         this.items = [];
         if (comments) {
             comments.forEach(this.addComment);
@@ -147,6 +143,8 @@ export class PotEntry {
         this.addMsgidPlural(entry[1]);
         this.addMsgstrPlural(includeTranslations ? translations : []);
         return this;
-    }
-}
+    };
+    return PotEntry;
+}());
+exports.PotEntry = PotEntry;
 //# sourceMappingURL=convert.js.map

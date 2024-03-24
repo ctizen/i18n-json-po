@@ -44,6 +44,8 @@ function xor<T>(...args: Array<Array<T>>) {
       }
     }
   }
+  // Tests are expected to run on node >= 18
+  // @ts-expect-error
   return res ? [...new Set(res)] : [];
 }
 

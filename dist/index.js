@@ -1,7 +1,10 @@
-import * as cli from 'cli';
-import { readFile, writeFile } from 'fs';
-import { convert } from './convert';
-const options = cli.parse({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
+var cli = tslib_1.__importStar(require("cli"));
+var fs_1 = require("fs");
+var convert_1 = require("./convert");
+var options = cli.parse({
     src: ['s', 'A source JSON file to process', 'string', '__stdin'],
     output: ['o', 'Output POT file', 'string', '__stdout'],
     copyrightSubject: ['c', 'Copyright for generated POT file', 'string', ''],
@@ -11,34 +14,19 @@ const options = cli.parse({
     help: ['h', 'Show some help', 'bool', false]
 });
 if (options.help) {
-    console.log(`i18n JSON -> POT converter
-
-Options:
-   -h / --help                   Show this help
-   -s / --src FILE               Define input JSON file name. Defaults 
-                                 to stdin.
-   -o / --output FILE            Define output POT file name. If a file 
-                                 already exists, it's contents will be
-                                 overwritten. Defaults to stdout.
-   -p / --printOccurences        Print "#:" comments which indicate string 
-                                 occurences in source code.
-   
-   -c / --copyrightSubject SUBJ  Team name or author name.
-   -b / --bugsEmail EMAIL        Email for sending bugs
-   -y / --year YEAR              Copyright year, defaults to current year.
-`);
+    console.log("i18n JSON -> POT converter\n\nOptions:\n   -h / --help                   Show this help\n   -s / --src FILE               Define input JSON file name. Defaults \n                                 to stdin.\n   -o / --output FILE            Define output POT file name. If a file \n                                 already exists, it's contents will be\n                                 overwritten. Defaults to stdout.\n   -p / --printOccurences        Print \"#:\" comments which indicate string \n                                 occurences in source code.\n   \n   -c / --copyrightSubject SUBJ  Team name or author name.\n   -b / --bugsEmail EMAIL        Email for sending bugs\n   -y / --year YEAR              Copyright year, defaults to current year.\n");
     process.exit(0);
 }
 console.warn('Running conversion for file: ', options.src);
-const meta = {
+var meta = {
     copyrightSubject: options.copyrightSubject,
     bugsEmail: options.bugsEmail,
     year: options.year,
 };
 if (options.src === '__stdin') {
-    cli.withStdin((data) => {
+    cli.withStdin(function (data) {
         try {
-            makeOutput(convert(data, meta, options.printOccurences), options.output);
+            makeOutput((0, convert_1.convert)(data, meta, options.printOccurences), options.output);
         }
         catch (e) {
             console.error(e);
@@ -47,13 +35,13 @@ if (options.src === '__stdin') {
     });
 }
 else {
-    readFile(options.src, { encoding: 'utf-8' }, (err, data) => {
+    (0, fs_1.readFile)(options.src, { encoding: 'utf-8' }, function (err, data) {
         if (err) {
             console.error(err);
             process.exit(1);
         }
         try {
-            makeOutput(convert(data, meta, options.printOccurences), options.output);
+            makeOutput((0, convert_1.convert)(data, meta, options.printOccurences), options.output);
         }
         catch (e) {
             console.error(e);
@@ -66,7 +54,7 @@ function makeOutput(data, output) {
         console.log(data);
     }
     else {
-        writeFile(output, data, (e) => {
+        (0, fs_1.writeFile)(output, data, function (e) {
             if (e) {
                 console.error(e);
                 process.exit(1);
